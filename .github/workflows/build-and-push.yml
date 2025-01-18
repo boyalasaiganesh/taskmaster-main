@@ -26,17 +26,24 @@ jobs:
     # Step 3: Login to Amazon ECR
     - name: Login to Amazon ECR
       id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      uses: aws-actions/amazon-ecr-login@v2
+
+    # Step 3.1: Create ECR Repository if it doesn't exist
+    - name: Create ECR Repository (if not exists)
+      run: |
+        aws ecr describe-repositories --repository-name spring-boot-app-repo || \
+        aws ecr create-repository --repository-name spring-boot-app-repo
 
     # Step 4: Build and Tag the Docker Image
     - name: Build Docker Image
       run: |
-        IMAGE_TAG=latest
+        set -e
+        IMAGE_TAG=${{ github.sha }}
         IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/spring-boot-app-repo:$IMAGE_TAG
-        docker build -t $IMAGE_URI .
+        docker build -t $IMAGE_URI -t ${{ steps.login-ecr.outputs.registry }}/spring-boot-app-repo:latest .
         echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
 
-    # Step 5: Push the Docker Image to ECR
+    # Step 5: Push Docker Image to ECR
     - name: Push Docker Image
       run: |
         docker push ${{ env.IMAGE_URI }}
