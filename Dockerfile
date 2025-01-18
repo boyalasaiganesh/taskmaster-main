@@ -1,17 +1,18 @@
-# Use an OpenJDK image as the base
+# Dockerfile
 FROM openjdk:17-jdk-slim
 
 # Set the working directory inside the container
 WORKDIR /app
 
 # Copy the Gradle wrapper and configuration files to cache dependencies
-COPY gradlew build.gradle settings.gradle /app/
+COPY --chmod=755 gradlew /app/gradlew
+COPY build.gradle settings.gradle /app/
 COPY gradle /app/gradle
 
-# Ensure the Gradle wrapper script has executable permissions
-RUN chmod +x ./gradlew
+# Verify permissions of gradlew
+RUN ls -l /app/gradlew
 
-# Download Gradle dependencies (fail gracefully to cache as much as possible)
+# Download Gradle dependencies to cache (fail gracefully to allow partial caching)
 RUN ./gradlew dependencies --no-daemon || true
 
 # Copy the rest of the project files into the container
