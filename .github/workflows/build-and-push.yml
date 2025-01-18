@@ -28,7 +28,7 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v2
 
-    # Step 3.1: Create ECR Repository if it doesn't exist
+    # Step 3.1: Create ECR Repository (if not exists)
     - name: Create ECR Repository (if not exists)
       run: |
         aws ecr describe-repositories --repository-name spring-boot-app-repo || \
@@ -47,3 +47,8 @@ jobs:
     - name: Push Docker Image
       run: |
         docker push ${{ env.IMAGE_URI }}
+
+    # Step 6: Update ECS Service (Optional)
+    - name: Update ECS Service
+      run: |
+        aws ecs update-service --cluster your-cluster-name --service your-service-name --force-new-deployment

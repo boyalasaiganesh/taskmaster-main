@@ -1,10 +1,6 @@
 # Use an OpenJDK image as the base
 FROM openjdk:17-jdk-slim
 
-# Create a non-root user for running the application
-RUN adduser --disabled-password --gecos "" myuser
-USER myuser
-
 # Set the working directory inside the container
 WORKDIR /app
 
@@ -13,7 +9,7 @@ COPY gradlew build.gradle settings.gradle /app/
 COPY gradle /app/gradle
 
 # Ensure the Gradle wrapper script has executable permissions
-RUN chmod +x gradlew
+RUN chmod +x ./gradlew
 
 # Download Gradle dependencies (fail gracefully to cache as much as possible)
 RUN ./gradlew dependencies --no-daemon || true
