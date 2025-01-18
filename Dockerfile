@@ -1,6 +1,10 @@
 # Use an OpenJDK image as the base
 FROM openjdk:17-jdk-slim
 
+# Create a non-root user for running the application
+RUN adduser --disabled-password --gecos "" myuser
+USER myuser
+
 # Set the working directory inside the container
 WORKDIR /app
 
